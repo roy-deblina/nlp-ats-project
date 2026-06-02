@@ -31,7 +31,8 @@ def load_llm():
         with st.spinner("📥 Downloading Qwen model from Hugging Face hub (first run only)..."):
             resolved_model_path = hf_hub_download(
                 repo_id="111deblina/qwen-ats-model",
-                filename="qwen2.5-1.5b-instruct-q4_k_m.gguf"
+                filename="qwen2.5-1.5b-instruct-q4_k_m.gguf",
+                local_dir_use_symlinks=False  # Avoids deprecated resume_download warnings completely
             )
     else:
         resolved_model_path = raw_path
@@ -41,9 +42,9 @@ def load_llm():
     
     # CONFIGURATION: Adjust based on cloud memory thresholds
     if is_cloud:
-        n_ctx = int(os.environ.get("LLAMA_N_CTX", "1024"))
-        n_batch = int(os.environ.get("LLAMA_N_BATCH", "64"))
-        n_threads = int(os.environ.get("LLAMA_N_THREADS", "2"))
+        n_ctx = int(os.environ.get("LLAMA_N_CTX", "512"))       # Drastically reduced to prevent OOM
+        n_batch = int(os.environ.get("LLAMA_N_BATCH", "32"))    # Lower batch size
+        n_threads = int(os.environ.get("LLAMA_N_THREADS", "1")) # Single thread for lower overhead
     else:
         n_ctx = int(os.environ.get("LLAMA_N_CTX", "2048"))
         n_batch = int(os.environ.get("LLAMA_N_BATCH", "128"))

@@ -298,6 +298,9 @@ with tab_analysis:
                 height=300,
                 placeholder="Paste resume content or upload a file..."
             )
+            
+            # ADD THIS WARNING
+            st.caption("⚠️ **Note:** To prevent memory limits on the cloud, resume text is automatically truncated to the first 3,500 characters.")
 
         # ==================================================
         # JOB DESCRIPTION
@@ -329,6 +332,9 @@ with tab_analysis:
                 height=300,
                 placeholder="Paste job description or upload a file..."
             )
+            
+            # ADD THIS WARNING
+            st.caption("⚠️ **Note:** To prevent memory limits on the cloud, job description text is automatically truncated to the first 1,500 characters.")
 
     # ------------------------------------------------------
     # VALIDATION ACTION
