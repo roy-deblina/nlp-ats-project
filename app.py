@@ -133,8 +133,6 @@ footer {
 # ==========================================================
 
 def extract_keywords_from_text(text: str) -> list:
-    """Extract technical keywords from text (simple heuristic)."""
-    # Common tech keywords pattern
     keywords = re.findall(
         r'\b(?:Python|Java|C\+\+|SQL|JavaScript|TypeScript|React|Vue|Angular|'
         r'Node\.js|Django|Flask|FastAPI|AWS|GCP|Azure|Docker|Kubernetes|'
@@ -145,7 +143,8 @@ def extract_keywords_from_text(text: str) -> list:
         text,
         re.IGNORECASE
     )
-    return list(set(keywords))[:5]  # Top 5 unique keywords
+    # Convert everything to lowercase to fix duplicate/missing bugs
+    return list(set([k.lower() for k in keywords]))[:5]
 
 def get_color_coded_score(score: float) -> str:
     """Return emoji and color for ATS score."""
@@ -179,8 +178,7 @@ def compare_keywords(jd_keywords: list, resume_keywords: list) -> tuple:
 
 @st.cache_resource(show_spinner=False)
 def load_ats_engine():
-
-    return AdvancedHybridATS()
+    return AdvancedHybridATS(semantic_weight=0.60)
 
 # ==========================================================
 # TITLE & INTRO
