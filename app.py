@@ -31,7 +31,7 @@ try:
     if torch.backends.mps.is_available():
         INFERENCE_TYPE = "🔧 Inference: Apple Metal (MPS Optimized)"
     else:
-        INFERENCE_TYPE = "⚡ Inference: Linux CPU (Cloud Optimized)"
+        INFERENCE_TYPE = "⚡ Inference: Linux CPU"
 except ImportError:
     INFERENCE_TYPE = "⚡ Inference: CPU (PyTorch Unavailable)"
 
@@ -234,7 +234,7 @@ with st.sidebar:
     st.markdown("""
     ### 👩‍💻 Developer
     **Deblina Roy**  
-    [View Source on GitHub ↗](https://github.com/111deblina/NextGen-AI-Powered-ATS-Optimizer)
+    [View Source on GitHub ↗](https://github.com/roy-deblina/nlp-ats-project)
     """)
 
     # Privacy Disclaimer (Massive green flag for tech interviews)
