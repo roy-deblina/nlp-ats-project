@@ -37,10 +37,11 @@ def load_llm():
 
         # ==========================================
         # CONTEXT WINDOW
-        # Conservative for 1-2GB RAM on cloud
+        # Balance: 1536 works on 8GB + cloud
+        # Allows ~800 input tokens + 600 output
         # ==========================================
 
-        n_ctx=1024,
+        n_ctx=1536,
 
         # ==========================================
         # GPU LAYERS
@@ -234,7 +235,7 @@ def generate_html_report(
 
             prompt,
 
-            max_tokens=1400,
+            max_tokens=600,
 
             temperature=0.2,
 
