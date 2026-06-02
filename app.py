@@ -199,31 +199,47 @@ st.info(
 
 with st.sidebar:
 
-    st.header("🚀 System Info")
+    st.header("🚀 System Architecture")
 
-    st.success("🧠 Embedding Model: MiniLM-L6-v2")
-    st.success("⚡ Local LLM: Qwen2.5-1.5B Q4")
+    # Technical Specs
+    st.success("🧠 Embedding: MiniLM-L6-v2")
+    st.success("⚡ LLM: Qwen2.5-1.5B Q4_K_M")
     st.success(INFERENCE_TYPE)
 
     st.markdown("---")
 
+    # Quick Start Guide
     st.markdown("""
-    ### ✨ Features
-    
-    - 📊 Hybrid ATS scoring
-    - 🧠 Semantic similarity matching
-    - 🔍 Lexical keyword analysis
-    - 📝 Local recruiter-style analysis
-    - 💾 Persistent report history
-    🔒 Privacy Note: All processing is done in-memory. Documents are not permanently stored or used to train public models.
-                
-Quick Start Guide:
-Example: 
-    1. Paste Target JD
-    2. Upload Candidate Resume
-    3. Run Validation Pipeline
-                
+    ### 📖 Quick Start
+    1. Input candidate name & role
+    2. Upload/Paste Resume & JD
+    3. Click **Run Validation Pipeline**
     """)
+
+    st.markdown("---")
+
+    # Trimmed Features List
+    st.markdown("""
+    ### ✨ Core Features
+    - 📊 Hybrid ATS scoring engine
+    - 🧠 Semantic similarity matching
+    - 🔍 Lexical keyword extraction
+    - 📝 Offline recruiter-style analysis
+    - 💾 Persistent SQLite history
+    """)
+    
+    st.markdown("---")
+
+    # Portfolio Links
+    st.markdown("""
+    ### 👩‍💻 Developer
+    **Deblina Roy**  
+    [View Source on GitHub ↗](https://github.com/111deblina/NextGen-AI-Powered-ATS-Optimizer)
+    """)
+
+    # Privacy Disclaimer (Massive green flag for tech interviews)
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.caption("🔒 **Privacy Note:** All NLP processing is executed securely in-memory. Uploaded resumes are never stored permanently or used to train public models.")
 
 # ==========================================================
 # LOAD ENGINE
