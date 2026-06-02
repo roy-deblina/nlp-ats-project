@@ -421,10 +421,12 @@ with tab_analysis:
         # Stage 4: LLM Evaluation
         status_text.write("75% — Generating recruiter-style analysis...")
         progress_bar.progress(75)
-        html_report = generate_html_report(
-            resume_input,
-            jd_input
-        )
+        # Add the spinning circle context manager here
+        with st.spinner("🔄 Generating recruiter-style analysis... (This may take a moment)"):
+            html_report = generate_html_report(
+                resume_input,
+                jd_input
+            )
 
         # Stage 5: Save Report
         status_text.write("100% — Saving report to database...")
@@ -508,6 +510,8 @@ with tab_analysis:
             if missing:
                 for kw in missing[:5]:
                     st.write(f"   ❌ {kw}")
+            elif not jd_keywords:
+                st.caption("No technical keywords found in Job Description.")
             else:
                 st.caption("✓ All detected keywords are present!")
         
@@ -516,6 +520,8 @@ with tab_analysis:
             if matched:
                 for kw in matched[:5]:
                     st.write(f"   ✓ {kw}")
+            elif not jd_keywords:
+                st.caption("No technical keywords found in Job Description.")
             else:
                 st.caption("No keyword overlap detected")
 
@@ -542,9 +548,35 @@ with tab_analysis:
         st.subheader("📈 Score Breakdown")
         
         breakdown_cols = st.columns(3)
-        breakdown_cols[0].metric("Semantic Match", f"{semantic_score}%")
-        breakdown_cols[1].metric("Keyword Match", f"{lexical_score}%")
-        breakdown_cols[2].metric("Overall ATS", f"{score_data['ats_score']}%")
+        
+        # Added 'help' tooltips to explain the metrics on hover
+        breakdown_cols[0].metric(
+            label="Semantic Match", 
+            value=f"{semantic_score}%",
+            help="Measures contextual similarity and meaning between resume and JD using AI embeddings."
+        )
+        breakdown_cols[1].metric(
+            label="Keyword Match", 
+            value=f"{lexical_score}%",
+            help="Measures exact and standardized technical keyword overlap."
+        )
+        breakdown_cols[2].metric(
+            label="Overall ATS", 
+            value=f"{score_data['ats_score']}%",
+            help="Weighted combination: 60% Semantic + 40% Keyword"
+        )
+        
+        # Added expander to explain the calculations clearly to the user
+        with st.expander("ℹ️ How are these scores calculated?"):
+            st.markdown("""
+            * **Semantic Match (60%):** Uses an AI embedding model to understand the *meaning* and *context* of your resume compared to the job description. It recognizes related concepts even if they aren't exact word matches.
+            * **Keyword/Lexical Match (40%):** Scans for exact technical skills, tools, and industry keywords. It applies a standard ATS taxonomy and calculates the overlap percentage.
+            * **Overall Score:** A weighted hybrid of both metrics simulating how a modern ATS will rank your profile.
+            * **Fit Classification:** 
+                * **Strong Fit:** 80-100
+                * **Potential Fit:** 60-79
+                * **Not a Fit:** Below 60
+            """)
         
         st.caption("ATS Score = (Semantic Match × 0.6) + (Keyword Match × 0.4)")
 

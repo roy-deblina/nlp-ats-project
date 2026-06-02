@@ -18,7 +18,7 @@ warnings.filterwarnings(
 # ==========================================================
 # LOAD LOCAL QWEN MODEL - CLOUD & STORAGE OPTIMIZED
 # ==========================================================
-@st.cache_resource
+@st.cache_resource(show_spinner=False)
 def load_llm():
     # 1. Resolve model path dynamically inside the cached resource execution
     raw_path = os.environ.get(
