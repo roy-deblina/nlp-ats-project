@@ -16,11 +16,24 @@ from file_parser import parse_uploaded_file
 from database import save_report, get_all_reports
 
 # ==========================================================
-# ENVIRONMENT DETECTION
+# SESSION STATE INITIALIZATION
 # ==========================================================
 
-IS_CLOUD = os.environ.get("STREAMLIT_CLOUD", "false").lower() == "true"
-INFERENCE_TYPE = "Linux CPU (Cloud Optimized)" if IS_CLOUD else "Apple Metal (MPS Optimized)"
+if "analysis_complete" not in st.session_state:
+    st.session_state.analysis_complete = False
+
+# ==========================================================
+# DEVICE DETECTION (Torch-based)
+# ==========================================================
+
+try:
+    import torch
+    if torch.backends.mps.is_available():
+        INFERENCE_TYPE = "🔧 Inference: Apple Metal (MPS Optimized)"
+    else:
+        INFERENCE_TYPE = "⚡ Inference: Linux CPU (Cloud Optimized)"
+except ImportError:
+    INFERENCE_TYPE = "⚡ Inference: CPU (PyTorch Unavailable)"
 
 # ==========================================================
 # PAGE CONFIG
@@ -139,9 +152,26 @@ def get_color_coded_score(score: float) -> str:
     if score >= 70:
         return "🟢"
     elif score >= 40:
-        return "🟠"
+        return "�"
     else:
         return "🔴"
+
+def get_score_interpretation(score: float) -> tuple:
+    """Return interpretation and color for ATS score."""
+    if score >= 70:
+        return "✅ Strong ATS compatibility. Resume is well-optimized.", "success"
+    elif score >= 40:
+        return "⚠️ Moderate ATS compatibility. Several improvements possible.", "warning"
+    else:
+        return "❌ Low ATS compatibility. Significant resume optimization recommended.", "error"
+
+def compare_keywords(jd_keywords: list, resume_keywords: list) -> tuple:
+    """Return missing and matched keywords."""
+    jd_set = set(jd_keywords)
+    resume_set = set(resume_keywords)
+    missing = list(jd_set - resume_set)
+    matched = list(jd_set & resume_set)
+    return missing, matched
 
 # ==========================================================
 # RESOURCE CACHING
@@ -175,7 +205,7 @@ with st.sidebar:
 
     st.success("🧠 Embedding Model: MiniLM-L6-v2")
     st.success("⚡ Local LLM: Qwen2.5-1.5B Q4")
-    st.success(f"⚡ Inference: {INFERENCE_TYPE}")
+    st.success(INFERENCE_TYPE)
 
     st.markdown("---")
 
@@ -228,12 +258,12 @@ with tab_analysis:
     )
 
     # ------------------------------------------------------
-    # FILE INPUT SECTION
+    # FILE INPUT SECTION (COLLAPSES AFTER ANALYSIS)
     # ------------------------------------------------------
 
     with st.expander(
         "📥 Upload & Review Documents",
-        expanded=True
+        expanded=not st.session_state.analysis_complete
     ):
 
         col1, col2 = st.columns(2)
@@ -409,8 +439,11 @@ with tab_analysis:
         progress_bar.empty()
         status_text.empty()
 
-        # Show success confirmation
-        st.success(f"✅ Report saved successfully — Processed in {elapsed_time:.2f}s")
+        # Mark analysis as complete for session state
+        st.session_state.analysis_complete = True
+
+        # Show success confirmation (compact)
+        st.toast(f"✅ Report generated in {elapsed_time:.2f}s")
 
         # ==================================================
         # SCROLL ANCHOR
@@ -452,45 +485,76 @@ with tab_analysis:
         )
 
         # ==================================================
-        # MISSING KEYWORDS SECTION
+        # MISSING VS MATCHED KEYWORDS
         # ==================================================
 
         st.markdown("---")
-        st.subheader("🎯 Missing Keywords & Top Skills")
+        st.subheader("🎯 Keyword Analysis")
         
-        missing_keywords = extract_keywords_from_text(jd_input)
+        jd_keywords = extract_keywords_from_text(jd_input)
         resume_keywords = extract_keywords_from_text(resume_input)
+        missing, matched = compare_keywords(jd_keywords, resume_keywords)
         
-        col_missing, col_present = st.columns(2)
+        col_missing, col_matched = st.columns(2)
         
         with col_missing:
-            st.write("**Keywords in JD:**")
-            if missing_keywords:
-                for kw in missing_keywords[:5]:
-                    st.write(f"• {kw}")
+            st.write("**❌ Missing Keywords:**")
+            if missing:
+                for kw in missing[:5]:
+                    st.write(f"   ❌ {kw}")
             else:
-                st.caption("No common keywords detected")
+                st.caption("✓ All detected keywords are present!")
         
-        with col_present:
-            st.write("**Keywords in Resume:**")
-            if resume_keywords:
-                for kw in resume_keywords[:5]:
-                    st.write(f"✓ {kw}")
+        with col_matched:
+            st.write("**✅ Matched Keywords:**")
+            if matched:
+                for kw in matched[:5]:
+                    st.write(f"   ✓ {kw}")
             else:
-                st.caption("No common keywords detected")
+                st.caption("No keyword overlap detected")
+
+        # ==================================================
+        # RESUME STRENGTHS CARD
+        # ==================================================
+
+        st.markdown("---")
+        st.subheader("💪 Resume Strengths")
+        
+        strengths_text = f"""
+        ✓ Resume parsed successfully
+        ✓ {len(resume_keywords)} technical keywords detected
+        ✓ Semantic similarity: {semantic_score}%
+        ✓ Ready for {job_title} role
+        """
+        st.success(strengths_text)
+
+        # ==================================================
+        # SCORE BREAKDOWN EXPLANATION
+        # ==================================================
+
+        st.markdown("---")
+        st.subheader("📈 Score Breakdown")
+        
+        breakdown_cols = st.columns(3)
+        breakdown_cols[0].metric("Semantic Match", f"{semantic_score}%")
+        breakdown_cols[1].metric("Keyword Match", f"{lexical_score}%")
+        breakdown_cols[2].metric("Overall ATS", f"{score_data['ats_score']}%")
+        
+        st.caption("ATS Score = (Semantic Match × 0.6) + (Keyword Match × 0.4)")
 
         # ==================================================
         # SCORE INTERPRETATION
         # ==================================================
 
         st.markdown("---")
-
-        if score_data["ats_score"] >= 70:
-            st.success("✅ Excellent ATS alignment detected.")
-        elif score_data["ats_score"] >= 40:
-            st.warning("⚠️ Moderate ATS alignment detected.")
+        interpretation, msg_type = get_score_interpretation(score_data["ats_score"])
+        
+        if msg_type == "success":
+            st.success(interpretation)
+        elif msg_type == "warning":
+            st.warning(interpretation)
         else:
-            st.error("❌ Low ATS alignment detected.")
+            st.error(interpretation)
 
         # ==================================================
         # COLLAPSE UPLOAD SECTION AFTER ANALYSIS
