@@ -16,112 +16,49 @@ warnings.filterwarnings(
 )
 
 # ==========================================================
-# CLOUD-SAFE MODEL DOWNLOAD INITIALIZATION
+# LOAD LOCAL QWEN MODEL - CLOUD & STORAGE OPTIMIZED
 # ==========================================================
 @st.cache_resource
-def get_local_model_path():
-    """
-    Download Qwen model from HuggingFace Hub if needed.
-    
-    On cloud: First request downloads and caches model
-    On local: Uses local path if it exists
-    
-    Returns: Local path to model file
-    """
+def load_llm():
+    # 1. Resolve model path dynamically inside the cached resource execution
     raw_path = os.environ.get(
         "QWEN_MODEL_PATH", 
         "models/llm/qwen2.5-1.5b-instruct-q4_k_m.gguf"
     )
     
-    # Check if this is a HuggingFace Hub URL
+    # 2. Check if this is a HuggingFace Hub URL and pull down via huggingface_hub safely
     if "huggingface.co" in raw_path:
-        with st.spinner("📥 Downloading Qwen model from Hugging Face (first run only)..."):
-            # Parse HF URL and download
-            model_file = hf_hub_download(
+        with st.spinner("📥 Downloading Qwen model from Hugging Face hub (first run only)..."):
+            resolved_model_path = hf_hub_download(
                 repo_id="111deblina/qwen-ats-model",
                 filename="qwen2.5-1.5b-instruct-q4_k_m.gguf"
             )
-            return model_file
+    else:
+        resolved_model_path = raw_path
     
-    # Local path: use as-is
-    return raw_path
-
-MODEL_PATH = get_local_model_path()
-
-# ==========================================================
-# LOAD LOCAL QWEN MODEL - CLOUD OPTIMIZED
-# ==========================================================
-@st.cache_resource
-def load_llm():
-    import platform
-    
-    # Detect if running on cloud vs local
+    # 3. Detect if running on cloud vs local
     is_cloud = os.environ.get("STREAMLIT_CLOUD", "false").lower() == "true"
     
-    # CONFIGURATION: Adjust based on environment
+    # CONFIGURATION: Adjust based on cloud memory thresholds
     if is_cloud:
-        # Cloud deployment: limited resources
         n_ctx = int(os.environ.get("LLAMA_N_CTX", "1024"))
         n_batch = int(os.environ.get("LLAMA_N_BATCH", "64"))
         n_threads = int(os.environ.get("LLAMA_N_THREADS", "2"))
     else:
-        # Local M1 Mac: proven optimal settings from repo config
         n_ctx = int(os.environ.get("LLAMA_N_CTX", "2048"))
         n_batch = int(os.environ.get("LLAMA_N_BATCH", "128"))
         n_threads = int(os.environ.get("LLAMA_N_THREADS", "4"))
 
+    # 4. Initialize Llama engine with your resolved local cache directory pointer
     return Llama(
-
-        model_path=MODEL_PATH,
-
-        # ==========================================
-        # CONTEXT WINDOW
-        # Local: 2048 (proven M1 optimal)
-        # Cloud: 1024 (limited memory)
-        # ==========================================
-
+        model_path=resolved_model_path,
         n_ctx=n_ctx,
-
-        # ==========================================
-        # GPU LAYERS
-        # Always 0 for M1 with llama-cpp-python 0.3.23
-        # ==========================================
-
         n_gpu_layers=0,
-
-        # ==========================================
-        # CPU THREADS
-        # Local M1: 4 cores
-        # Cloud: 2 cores (adaptive)
-        # ==========================================
-
         n_threads=n_threads,
-
-        # ==========================================
-        # MEMORY MANAGEMENT
-        # ==========================================
-
         use_mmap=True,
         use_mlock=False,
-
-        # ==========================================
-        # BATCH SIZE
-        # Local: 128 (M1 can handle it)
-        # Cloud: 64 (memory constraints)
-        # ==========================================
-
         n_batch=n_batch,
-
-        # ==========================================
-        # DISABLE PROBLEMATIC FEATURES
-        # ==========================================
-
         logits_all=False,
-
-        # ==========================================
-        # SUPPRESS WARNINGS
-        # ==========================================
-
         verbose=False
     )
 
