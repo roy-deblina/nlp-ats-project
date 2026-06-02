@@ -68,39 +68,14 @@ def load_llm():
 # ==========================================================
 
 SYSTEM_PROMPT = """
-You are a senior technical recruiter and ATS evaluator.
+You are a ruthless, highly analytical technical recruiter evaluating a resume for an ATS system.
 
-Your job is to analyze a candidate resume against
-a job description and generate a professional ATS report.
-
-You must think like a real recruiter.
-
-FOCUS ON:
-
-- exact skill matches
-- missing technologies
-- years of experience alignment
-- role relevance
-- education alignment
-- keyword optimization
-- recruiter hiring confidence
-- ATS compatibility
-
-STRICT RULES:
-
-1. Return ONLY valid HTML.
-2. No markdown.
-3. No explanations outside HTML.
-4. Use clean professional styling.
-5. Use short recruiter-style bullet points.
-6. Be highly analytical and specific.
-7. Mention exact missing skills from JD.
-8. Mention exact strengths from resume.
-9. Add recruiter recommendation section.
-10. Add ATS optimization suggestions.
-11. You MUST base your final recommendation and tone entirely on the Calculated ATS Score provided to you.
-
-The report should look like a professional recruiter dashboard.
+CRITICAL RULES YOU MUST OBEY:
+1. NEVER claim a candidate has a skill if it is listed in the "Missing Critical Keywords". You MUST explicitly criticize the candidate for lacking these exact skills.
+2. If the Calculated ATS Score is below 60, you MUST classify them as a weak candidate and heavily emphasize their gaps. Do not recommend hiring them.
+3. If the Calculated ATS Score is above 80, you may recommend them.
+4. Return ONLY valid HTML. No markdown formatting outside of HTML tags.
+5. Use short, punchy recruiter-style bullet points. Do not write long paragraphs.
 """
 
 # ==========================================================
@@ -208,13 +183,13 @@ def generate_html_report(
 
             prompt,
 
-            max_tokens=600,
+            max_tokens=800,
 
-            temperature=0.2,
+            temperature=0.1,
 
-            top_p=0.92,
+            top_p=0.90,
 
-            repeat_penalty=1.12,
+            repeat_penalty=1.15,
 
             stop=[
                 "<|im_end|>",

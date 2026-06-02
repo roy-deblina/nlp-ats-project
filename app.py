@@ -148,18 +148,18 @@ def extract_keywords_from_text(text: str) -> list:
 
 def get_color_coded_score(score: float) -> str:
     """Return emoji and color for ATS score."""
-    if score >= 70:
+    if score >= 80:
         return "🟢"
-    elif score >= 40:
-        return "�"
+    elif score >= 60:            # Changed from 40 to 60 to match the engine
+        return "🟡"
     else:
         return "🔴"
 
 def get_score_interpretation(score: float) -> tuple:
     """Return interpretation and color for ATS score."""
-    if score >= 70:
+    if score >= 80:              # Changed from 70 to 80
         return "✅ Strong ATS compatibility. Resume is well-optimized.", "success"
-    elif score >= 40:
+    elif score >= 60:            # Changed from 40 to 60
         return "⚠️ Moderate ATS compatibility. Several improvements possible.", "warning"
     else:
         return "❌ Low ATS compatibility. Significant resume optimization recommended.", "error"
@@ -214,8 +214,15 @@ with st.sidebar:
     - 🧠 Semantic similarity matching
     - 🔍 Lexical keyword analysis
     - 📝 Local recruiter-style analysis
-    - 📄 PDF/DOCX/TXT parsing
     - 💾 Persistent report history
+    🔒 Privacy Note: All processing is done in-memory. Documents are not permanently stored or used to train public models.
+                
+Quick Start Guide:
+Example: 
+    1. Paste Target JD
+    2. Upload Candidate Resume
+    3. Run Validation Pipeline
+                
     """)
 
 # ==========================================================
