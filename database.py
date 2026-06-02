@@ -1,7 +1,8 @@
 # database.py
 # Advanced SQLite Persistence Layer
-# Optimized for Local ATS Platform
+# Optimized for Local ATS Platform + Cloud Deployment
 
+import os
 from datetime import datetime
 from contextlib import contextmanager
 
@@ -23,10 +24,16 @@ from sqlalchemy.orm import (
 from sqlalchemy.exc import SQLAlchemyError
 
 # ==========================================================
-# DATABASE CONFIG
+# DATABASE CONFIG - CLOUD COMPATIBLE
 # ==========================================================
 
-DATABASE_URL = "sqlite:///ats_database.db"
+# Use environment variable or default to current directory
+# Streamlit Cloud: uses /tmp or .streamlit directory
+db_dir = os.environ.get("DATABASE_DIR", ".")
+os.makedirs(db_dir, exist_ok=True)
+
+db_path = os.path.join(db_dir, "ats_database.db")
+DATABASE_URL = f"sqlite:///{db_path}"
 
 # ==========================================================
 # ENGINE

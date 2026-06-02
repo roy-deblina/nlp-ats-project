@@ -1,8 +1,9 @@
 # ats_engine.py
 # Lightweight Hybrid ATS Scoring Engine
-# Optimized for Apple Silicon (M1/M2/M3) with low RAM usage.
+# Optimized for Apple Silicon (M1/M2/M3) + Cloud Deployment
 
 import re
+import os
 import torch
 from typing import Dict, Any
 from sentence_transformers import SentenceTransformer
@@ -12,12 +13,21 @@ class AdvancedHybridATS:
 
     def __init__(
         self,
-        model_name: str = "models/embeddings/all-MiniLM-L6-v2",
+        model_name: str = None,
         semantic_weight: float = 0.40
     ):
+        # Default to HuggingFace Hub for cloud compatibility
+        if model_name is None:
+            # Check if local model exists, otherwise use HF Hub
+            local_path = "models/embeddings/all-MiniLM-L6-v2"
+            if os.path.exists(local_path):
+                model_name = local_path
+            else:
+                # Cloud: auto-download from HuggingFace
+                model_name = "sentence-transformers/all-MiniLM-L6-v2"
 
         # ---------------------------------------------------------
-        # DEVICE SELECTION
+        # DEVICE SELECTION - CLOUD COMPATIBLE
         # ---------------------------------------------------------
 
         self.device = (

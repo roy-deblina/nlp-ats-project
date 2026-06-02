@@ -1,22 +1,35 @@
 # analyzer.py
 # Fully Local ATS HTML Analyzer using Qwen2.5 GGUF + llama.cpp
-# Optimized for Apple Silicon (M1/M2/M3)
+# Optimized for Apple Silicon (M1/M2/M3) + Cloud Deployment
 
+import os
 from llama_cpp import Llama
 import textwrap
 import streamlit as st
 
 # ==========================================================
-# LOCAL MODEL PATH
+# LOCAL MODEL PATH - CLOUD COMPATIBLE
 # ==========================================================
 
-MODEL_PATH = "models/llm/qwen2.5-1.5b-instruct-q4_k_m.gguf"
+MODEL_PATH = os.environ.get(
+    "QWEN_MODEL_PATH",
+    "models/llm/qwen2.5-1.5b-instruct-q4_k_m.gguf"
+)
 
 # ==========================================================
-# LOAD LOCAL QWEN MODEL
+# LOAD LOCAL QWEN MODEL - CLOUD OPTIMIZED
 # ==========================================================
 @st.cache_resource
 def load_llm():
+    import platform
+    
+    # Cloud servers typically have more cores, detect system
+    is_cloud = os.environ.get("STREAMLIT_CLOUD", "false").lower() == "true"
+    num_threads = int(os.environ.get("LLAMA_N_THREADS", "4"))
+    
+    if is_cloud:
+        # Cloud: use reasonable defaults, more conservative
+        num_threads = min(4, os.cpu_count() or 4)
 
     return Llama(
 
@@ -24,25 +37,25 @@ def load_llm():
 
         # ==========================================
         # CONTEXT WINDOW
-        # Conservative for 8GB RAM + old llama-cpp
+        # Conservative for 1-2GB RAM on cloud
         # ==========================================
 
-        n_ctx=2048,
+        n_ctx=1024,
 
         # ==========================================
-        # GPU LAYERS FOR M1 METAL
-        # 0.3.23: Avoid too many layers on M1
+        # GPU LAYERS
+        # Cloud: typically no GPU, set to 0
         # ==========================================
 
-        n_gpu_layers=-1,
+        n_gpu_layers=0,
 
         # ==========================================
         # CPU THREADS
-        # 4 threads = optimal for M1 8GB
+        # Adaptive: c- CLOUD OPTIMIZED
+        # Smaller batch for cloud memory constraints
         # ==========================================
 
-        n_threads=4,
-
+        n_batch=64
         # ==========================================
         # MEMORY MANAGEMENT FOR 8GB
         # ==========================================

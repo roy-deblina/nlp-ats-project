@@ -1,11 +1,18 @@
-# Large model files
-models/
+# Large model files (will be downloaded on cloud deployment)
+models/embeddings/all-MiniLM-L6-v2/
+models/llm/qwen2.5-1.5b-instruct-q4_k_m.gguf
 
 # Data files
 data/
 
 # Markdown documentation
 markdown/
+
+# Database (generated at runtime)
+*.db
+*.sqlite
+*.sqlite3
+ats_database.db
 
 # Python cache
 __pycache__/
@@ -27,6 +34,14 @@ ENV/
 # Jupyter
 .ipynb_checkpoints/
 
+# Streamlit cache and secrets
+.streamlit/cache/
+.streamlit/secrets.toml
+
 # OS files
 .DS_Store
 *.egg-info/
+
+# Environment files
+.env
+.env.local
