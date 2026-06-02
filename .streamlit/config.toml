@@ -7,25 +7,13 @@ font = "sans serif"
 
 [client]
 showErrorDetails = true
+toolbarMode = "auto"
 
 [logger]
 level = "info"
 
 [server]
-# Memory settings for cloud deployment
 maxUploadSize = 200
 enableCORS = true
 enableXsrfProtection = true
-
-# Performance optimizations
-enableRunOnSave = true
-
-# Timeout settings
 maxMessageSize = 200
-
-[client.toolbarMode]
-toolbarMode = "auto"
-
-# Cache settings for faster model loading
-[cache]
-# Streamlit handles caching, no manual intervention needed
