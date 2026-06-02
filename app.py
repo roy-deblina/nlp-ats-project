@@ -417,13 +417,18 @@ with tab_analysis:
         )
 
         # Stage 4: LLM Evaluation
-        # status_text.write("75% — Generating analysis...")
-        # progress_bar.progress(75)
+        status_text.write("75% — Generating analysis...")
+        progress_bar.progress(75)
         # Add the spinning circle context manager here
-        with st.spinner("🔄 Generating analysis... (This may take a moment)"):
+        jd_keywords_list = extract_keywords_from_text(jd_input)
+        resume_keywords_list = extract_keywords_from_text(resume_input)
+        missing_kws, matched_kws = compare_keywords(jd_keywords_list, resume_keywords_list)
+        with st.spinner("🔄 Complete report analysis... (This may take a moment)"):
             html_report = generate_html_report(
-                resume_input,
-                jd_input
+                resume_text=resume_input,
+                jd_text=jd_input,
+                ats_score=score_data["ats_score"],
+                missing_keywords=missing_kws
             )
 
         # Stage 5: Save Report
