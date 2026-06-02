@@ -3,9 +3,16 @@
 # Optimized for Apple Silicon (M1/M2/M3) + Cloud Deployment
 
 import os
+import warnings
 from llama_cpp import Llama
 import textwrap
 import streamlit as st
+
+# Suppress harmless llama_context size mismatch warning
+warnings.filterwarnings(
+    "ignore",
+    message=".*n_ctx_seq.*n_ctx_train.*"
+)
 
 # ==========================================================
 # LOCAL MODEL PATH - CLOUD COMPATIBLE
@@ -23,13 +30,20 @@ MODEL_PATH = os.environ.get(
 def load_llm():
     import platform
     
-    # Cloud servers typically have more cores, detect system
+    # Detect if running on cloud vs local
     is_cloud = os.environ.get("STREAMLIT_CLOUD", "false").lower() == "true"
-    num_threads = int(os.environ.get("LLAMA_N_THREADS", "4"))
     
+    # CONFIGURATION: Adjust based on environment
     if is_cloud:
-        # Cloud: use reasonable defaults, more conservative
-        num_threads = min(4, os.cpu_count() or 4)
+        # Cloud deployment: limited resources
+        n_ctx = int(os.environ.get("LLAMA_N_CTX", "1024"))
+        n_batch = int(os.environ.get("LLAMA_N_BATCH", "64"))
+        n_threads = int(os.environ.get("LLAMA_N_THREADS", "2"))
+    else:
+        # Local M1 Mac: proven optimal settings from repo config
+        n_ctx = int(os.environ.get("LLAMA_N_CTX", "2048"))
+        n_batch = int(os.environ.get("LLAMA_N_BATCH", "128"))
+        n_threads = int(os.environ.get("LLAMA_N_THREADS", "4"))
 
     return Llama(
 
@@ -37,39 +51,41 @@ def load_llm():
 
         # ==========================================
         # CONTEXT WINDOW
-        # Balance: 1536 works on 8GB + cloud
-        # Allows ~800 input tokens + 600 output
+        # Local: 2048 (proven M1 optimal)
+        # Cloud: 1024 (limited memory)
         # ==========================================
 
-        n_ctx=1536,
+        n_ctx=n_ctx,
 
         # ==========================================
         # GPU LAYERS
-        # Cloud: typically no GPU, set to 0
+        # Always 0 for M1 with llama-cpp-python 0.3.23
         # ==========================================
 
         n_gpu_layers=0,
 
         # ==========================================
         # CPU THREADS
-        # Adaptive based on system
+        # Local M1: 4 cores
+        # Cloud: 2 cores (adaptive)
         # ==========================================
 
-        n_threads=num_threads,
+        n_threads=n_threads,
 
         # ==========================================
-        # MEMORY MANAGEMENT FOR CLOUD
+        # MEMORY MANAGEMENT
         # ==========================================
 
         use_mmap=True,
         use_mlock=False,
 
         # ==========================================
-        # BATCH SIZE - CLOUD OPTIMIZED
-        # Smaller batch for cloud memory constraints
+        # BATCH SIZE
+        # Local: 128 (M1 can handle it)
+        # Cloud: 64 (memory constraints)
         # ==========================================
 
-        n_batch=64,
+        n_batch=n_batch,
 
         # ==========================================
         # DISABLE PROBLEMATIC FEATURES

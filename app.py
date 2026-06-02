@@ -479,10 +479,8 @@ with tab_analysis:
             "📑 Detailed Recruiter Analysis"
         )
 
-        st.components.v1.html(
-            html_report,
-            height=1000,
-            scrolling=True
+        st.html(
+            html_report
         )
 
 # ==========================================================
@@ -594,8 +592,6 @@ with tab_history:
 
             st.markdown("---")
 
-            st.components.v1.html(
-                selected_report.html_report,
-                height=900,
-                scrolling=True
+            st.html(
+                selected_report.html_report
             )
