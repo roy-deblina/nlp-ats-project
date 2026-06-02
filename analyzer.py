@@ -51,24 +51,24 @@ def load_llm():
 
         # ==========================================
         # CPU THREADS
-        # Adaptive: c- CLOUD OPTIMIZED
-        # Smaller batch for cloud memory constraints
+        # Adaptive based on system
         # ==========================================
 
-        n_batch=64
+        n_threads=num_threads,
+
         # ==========================================
-        # MEMORY MANAGEMENT FOR 8GB
+        # MEMORY MANAGEMENT FOR CLOUD
         # ==========================================
 
         use_mmap=True,
         use_mlock=False,
 
         # ==========================================
-        # BATCH SIZE (0.3.23 specific)
-        # Reduce to prevent memory spikes
+        # BATCH SIZE - CLOUD OPTIMIZED
+        # Smaller batch for cloud memory constraints
         # ==========================================
 
-        n_batch=128,
+        n_batch=64,
 
         # ==========================================
         # DISABLE PROBLEMATIC FEATURES
