@@ -170,7 +170,7 @@ def generate_html_report(
         Generate a professional ATS recruiter report.
 
         Required Sections:
-        1. Executive Match Summary
+        1. Match Summary
         2. Technical Skill Alignment (Matched & Missing)
         3. Experience Gaps & Recruiter Concerns
         4. Final Hiring Recommendation
@@ -178,8 +178,7 @@ def generate_html_report(
         Instructions:
         - Keep the analysis punchy, detailed, and recruiter-focused.
         - Do not generate filler text.
-        - Return ONLY clean, valid HTML formatting (use <h3> for section headers).
-        - Return ONLY HTML
+        - Return ONLY clean, valid HTML formatting (use <h4> for all the above section headers).
         """
 
         # ==================================================
