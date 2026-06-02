@@ -42,7 +42,7 @@ def load_llm():
     
     # CONFIGURATION: Adjust based on cloud memory thresholds
     if is_cloud:
-        n_ctx = int(os.environ.get("LLAMA_N_CTX", "512"))       # Drastically reduced to prevent OOM
+        n_ctx = int(os.environ.get("LLAMA_N_CTX", "768"))       # Drastically reduced to prevent OOM
         n_batch = int(os.environ.get("LLAMA_N_BATCH", "32"))    # Lower batch size
         n_threads = int(os.environ.get("LLAMA_N_THREADS", "1")) # Single thread for lower overhead
     else:
@@ -170,27 +170,15 @@ def generate_html_report(
         Generate a professional ATS recruiter report.
 
         Required Sections:
-
-        1. Executive Summary
-        2. ATS Match Analysis
-        3. Technical Skills Evaluation
-        4. Experience Evaluation
-        5. Education & Certifications
-        6. Missing Keywords & Skill Gaps
-        7. Recruiter Concerns
-        8. ATS Optimization Suggestions
-        9. Final Hiring Recommendation
+        1. Executive Match Summary
+        2. Technical Skill Alignment (Matched & Missing)
+        3. Experience Gaps & Recruiter Concerns
+        4. Final Hiring Recommendation
 
         Instructions:
-
-        - Mention important matching skills
-        - Mention exact missing keywords
-        - Mention experience gaps
-        - Mention ATS strengths
-        - Mention recruiter concerns
-        - Mention resume weaknesses
-        - Use recruiter-style analysis
-        - Keep analysis detailed but concise
+        - Keep the analysis punchy, detailed, and recruiter-focused.
+        - Do not generate filler text.
+        - Return ONLY clean, valid HTML formatting (use <h3> for section headers).
         - Return ONLY HTML
         """
 
