@@ -1,10 +1,7 @@
 streamlit
 pandas
-torch
-transformers
-sentencepiece
-accelerate
 pymupdf
 python-docx
 sqlalchemy
-llama-cpp-python
+huggingface-hub
+llama-cpp-python==0.2.77
