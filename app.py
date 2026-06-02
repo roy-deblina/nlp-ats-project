@@ -629,7 +629,7 @@ st.markdown("---")
 st.markdown(
     """
     <div style="text-align:center;color:#64748b;font-size:0.85rem;margin-top:40px;">
-        Deblina Roy | 2026 | NLP ATS Project
+        Deblina Roy | 2026 | NLP ATS Platform
     </div>
     """,
     unsafe_allow_html=True
