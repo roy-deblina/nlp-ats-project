@@ -419,10 +419,10 @@ with tab_analysis:
         )
 
         # Stage 4: LLM Evaluation
-        status_text.write("75% — Generating recruiter-style analysis...")
+        status_text.write("75% — Generating analysis...")
         progress_bar.progress(75)
         # Add the spinning circle context manager here
-        with st.spinner("🔄 Generating recruiter-style analysis... (This may take a moment)"):
+        with st.spinner("🔄 Generating analysis... (This may take a moment)"):
             html_report = generate_html_report(
                 resume_input,
                 jd_input
