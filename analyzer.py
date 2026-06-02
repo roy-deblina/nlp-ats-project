@@ -5,6 +5,7 @@
 import os
 import warnings
 from llama_cpp import Llama
+from huggingface_hub import hf_hub_download
 import textwrap
 import streamlit as st
 
@@ -15,13 +16,37 @@ warnings.filterwarnings(
 )
 
 # ==========================================================
-# LOCAL MODEL PATH - CLOUD COMPATIBLE
+# CLOUD-SAFE MODEL DOWNLOAD INITIALIZATION
 # ==========================================================
+@st.cache_resource
+def get_local_model_path():
+    """
+    Download Qwen model from HuggingFace Hub if needed.
+    
+    On cloud: First request downloads and caches model
+    On local: Uses local path if it exists
+    
+    Returns: Local path to model file
+    """
+    raw_path = os.environ.get(
+        "QWEN_MODEL_PATH", 
+        "models/llm/qwen2.5-1.5b-instruct-q4_k_m.gguf"
+    )
+    
+    # Check if this is a HuggingFace Hub URL
+    if "huggingface.co" in raw_path:
+        with st.spinner("📥 Downloading Qwen model from Hugging Face (first run only)..."):
+            # Parse HF URL and download
+            model_file = hf_hub_download(
+                repo_id="111deblina/qwen-ats-model",
+                filename="qwen2.5-1.5b-instruct-q4_k_m.gguf"
+            )
+            return model_file
+    
+    # Local path: use as-is
+    return raw_path
 
-MODEL_PATH = os.environ.get(
-    "QWEN_MODEL_PATH",
-    "models/llm/qwen2.5-1.5b-instruct-q4_k_m.gguf"
-)
+MODEL_PATH = get_local_model_path()
 
 # ==========================================================
 # LOAD LOCAL QWEN MODEL - CLOUD OPTIMIZED
