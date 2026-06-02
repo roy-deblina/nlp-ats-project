@@ -74,8 +74,13 @@ CRITICAL RULES YOU MUST OBEY:
 1. NEVER claim a candidate has a skill if it is listed in the "Missing Critical Keywords". You MUST explicitly criticize the candidate for lacking these exact skills.
 2. If the Calculated ATS Score is below 60, you MUST classify them as a weak candidate and heavily emphasize their gaps. Do not recommend hiring them.
 3. If the Calculated ATS Score is above 80, you may recommend them.
-4. Return ONLY valid HTML. No markdown formatting outside of HTML tags.
-5. Use short, punchy recruiter-style bullet points. Do not write long paragraphs.
+4. You MUST format your response using this EXACT HTML structure:
+   <h4>Match Summary</h4><p>...</p>
+   <h4>Technical Skill Alignment</h4><ul><li>...</li></ul>
+   <h4>Experience Gaps & Concerns</h4><p>...</p>
+   <h4>Final Hiring Recommendation</h4><p>...</p>
+5. Return ONLY valid HTML. No markdown outside of HTML tags.
+6. DO NOT hardcode any background colors or text colors in your HTML. Use semantic tags (like <strong>, <em>) so the UI inherits the user's light/dark mode theme.
 """
 
 # ==========================================================
@@ -217,34 +222,24 @@ def generate_html_report(
         # ==================================================
 
         if "<div" not in generated_text and "<html" not in generated_text:
-
             generated_text = f"""
             <div style="
-                font-family: Arial, sans-serif;
+                font-family: inherit;
                 padding: 24px;
                 border-radius: 12px;
-                background: #ffffff;
-                border: 1px solid #dee2e6;
+                border: 1px solid rgba(128, 128, 128, 0.2);
                 line-height: 1.6;
             ">
-
-                <h2 style="color:#0d6efd;">
-                    ATS Recruiter Analysis
-                </h2>
-
+                <h2 style="color:#2563eb;">ATS Recruiter Analysis</h2>
                 <div style="
-                    background:#f8f9fa;
-                    padding:18px;
-                    border-radius:8px;
-                    margin-top:15px;
+                    padding: 18px;
+                    border-radius: 8px;
+                    margin-top: 15px;
+                    background-color: rgba(128, 128, 128, 0.05);
                 ">
-
             {generated_text}
-
-        </div>
-
-    </div>
-    """
+            </div></div>
+            """
 
         return generated_text
 

@@ -12,3 +12,4 @@ python-docx
 sqlalchemy
 huggingface-hub
 llama-cpp-python==0.2.77
+plotly

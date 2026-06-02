@@ -8,6 +8,7 @@ os.environ["TOKENIZERS_PARALLELISM"] = "false"
 import time
 import re
 import pandas as pd
+import plotly.graph_objects as go
 import streamlit as st
 
 from ats_engine import AdvancedHybridATS
@@ -66,8 +67,8 @@ html, body, [class*="css"] {
 ====================================================== */
 
 div[data-testid="metric-container"] {
-    background: linear-gradient(145deg, #ffffff, #f8fafc);
-    border: 1px solid #e5e7eb;
+    background-color: transparent;
+    border: 1px solid rgba(128, 128, 128, 0.2);
     padding: 20px;
     border-radius: 14px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.05);
@@ -306,12 +307,12 @@ with tab_analysis:
             parsed_resume = ""
 
             if resume_file:
-
                 with st.spinner("Parsing resume..."):
-
-                    parsed_resume = parse_uploaded_file(
-                        resume_file
-                    )
+                    parsed_resume = parse_uploaded_file(resume_file)
+                    
+                    if len(parsed_resume.strip()) < 50:
+                        st.error("⚠️ Warning: Could not extract sufficient text. Please ensure the uploaded file is a text-based document (not a scanned image) and try again.")
+                        st.stop()
 
             resume_input = st.text_area(
                 "Resume Text",
@@ -558,11 +559,19 @@ with tab_analysis:
         st.markdown("---")
         st.subheader("💪 Resume Strengths")
         
+        # Make the readiness statement dynamic based on the score
+        if score_data["ats_score"] >= 80:
+            readiness = f"Highly qualified for {job_title} role"
+        elif score_data["ats_score"] >= 60:
+            readiness = f"Potential fit for {job_title} role"
+        else:
+            readiness = f"Requires optimization for {job_title} role"
+
         strengths_text = f"""
         ✓ Resume parsed successfully
         ✓ {len(resume_keywords)} technical keywords detected
         ✓ Semantic similarity: {semantic_score}%
-        ✓ Ready for {job_title} role
+        ✓ {readiness}
         """
         st.success(strengths_text)
 
@@ -626,14 +635,52 @@ with tab_analysis:
 
         st.markdown("---")
 
+
+        # ==================================================
+        # ALIGNMENT RADAR CHART
+        # ==================================================
+        st.markdown("---")
+        st.subheader("🕸️ Candidate Alignment Map")
+        
+        fig = go.Figure(data=go.Scatterpolar(
+          r=[semantic_score, lexical_score, score_data["ats_score"], semantic_score],
+          theta=['Semantic Match', 'Keyword Match', 'Overall ATS Fit', 'Semantic Match'],
+          fill='toself',
+          line_color='#2563eb'
+        ))
+        
+        fig.update_layout(
+          polar=dict(
+            radialaxis=dict(visible=True, range=[0, 100])
+          ),
+          showlegend=False,
+          margin=dict(l=40, r=40, t=20, b=20),
+          height=350,
+          paper_bgcolor="rgba(0,0,0,0)",  # Transparent for dark mode
+          plot_bgcolor="rgba(0,0,0,0)"
+        )
+        st.plotly_chart(fig, use_container_width=True)
+
+        # ==================================================
+        # HTML REPORT & DOWNLOAD
+        # ==================================================
+        st.markdown("---")
+        st.subheader("📑 Detailed Recruiter Analysis")
+
+
         # ==================================================
         # HTML REPORT
         # ==================================================
-
-        st.subheader("📑 Detailed Recruiter Analysis")
-
-        st.html(
-            html_report
+        st.html(html_report)
+        
+        st.markdown("<br>", unsafe_allow_html=True)
+        st.download_button(
+            label="📥 Download ATS Report (HTML)",
+            data=html_report,
+            file_name=f"{candidate_name.replace(' ', '_')}_ATS_Report.html",
+            mime="text/html",
+            use_container_width=True,
+            type="primary"
         )
 
 # ==========================================================
