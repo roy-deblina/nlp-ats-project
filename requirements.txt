@@ -1,5 +1,10 @@
 streamlit
 pandas
+torch
+transformers
+sentence-transformers
+sentencepiece
+accelerate
 pymupdf
 python-docx
 sqlalchemy

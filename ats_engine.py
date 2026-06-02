@@ -4,8 +4,24 @@
 
 import re
 import os
-import torch
 from typing import Dict, Any
+
+# =========================================================
+# CONDITIONAL TORCH IMPORT - CLOUD SAFE
+# =========================================================
+# Torch is required by sentence-transformers
+# This wrapper ensures graceful failure on cloud if missing
+
+try:
+    import torch
+    TORCH_AVAILABLE = True
+except ImportError:
+    TORCH_AVAILABLE = False
+    import warnings
+    warnings.warn(
+        "PyTorch not available. SentenceTransformer will use CPU-only mode."
+    )
+
 from sentence_transformers import SentenceTransformer
 
 
@@ -30,11 +46,15 @@ class AdvancedHybridATS:
         # DEVICE SELECTION - CLOUD COMPATIBLE
         # ---------------------------------------------------------
 
-        self.device = (
-            "mps"
-            if torch.backends.mps.is_available()
-            else ("cuda" if torch.cuda.is_available() else "cpu")
-        )
+        if TORCH_AVAILABLE:
+            self.device = (
+                "mps"
+                if torch.backends.mps.is_available()
+                else ("cuda" if torch.cuda.is_available() else "cpu")
+            )
+        else:
+            # Fallback: CPU only if torch not available
+            self.device = "cpu"
 
         # ---------------------------------------------------------
         # LOAD LIGHTWEIGHT EMBEDDING MODEL
