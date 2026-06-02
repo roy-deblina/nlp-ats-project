@@ -98,6 +98,7 @@ STRICT RULES:
 8. Mention exact strengths from resume.
 9. Add recruiter recommendation section.
 10. Add ATS optimization suggestions.
+11. You MUST base your final recommendation and tone entirely on the Calculated ATS Score provided to you.
 
 The report should look like a professional recruiter dashboard.
 """
@@ -108,7 +109,9 @@ The report should look like a professional recruiter dashboard.
 
 def generate_html_report(
     resume_text: str,
-    jd_text: str
+    jd_text: str,
+    ats_score: float,
+    missing_keywords: list
 ) -> str:
 
     try:
@@ -151,7 +154,9 @@ def generate_html_report(
         # ==================================================
 
         user_prompt = f"""
-        Analyze this candidate professionally.
+        Analyze this candidate professionally based on the following hard data:
+        - Calculated ATS Score: {ats_score}/100
+        - Missing Critical Keywords: {', '.join(missing_keywords) if missing_keywords else 'None'}
 
         ==================================================
         JOB DESCRIPTION
@@ -178,6 +183,8 @@ def generate_html_report(
         Instructions:
         - Keep the analysis punchy, detailed, and recruiter-focused.
         - Do not generate filler text.
+        - Your tone must match the Calculated ATS Score (e.g., critical for low scores, enthusiastic for high scores).
+        - Explicitly address the Missing Critical Keywords provided.
         - Return ONLY clean, valid HTML formatting (use <h4> for all the above section headers).
         """
 
@@ -263,7 +270,6 @@ def generate_html_report(
 
     </div>
     """
-        # st.code(generated_text, language="html")
 
         return generated_text
 
