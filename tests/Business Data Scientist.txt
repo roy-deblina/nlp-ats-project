@@ -1,0 +1,22 @@
+Business Data Scientist
+Google
+place
+Hyderabad, Telangana, India
+Minimum qualifications:
+Master's degree in a quantitative discipline such as Statistics, Engineering, Sciences, or equivalent practical experience.
+3 years of experience using analytics to solve product or business problems, coding (e.g., Python, R, SQL), querying databases or statistical analysis, or a PhD degree.
+
+Preferred qualifications:
+Experience with Adverse Impact Analysis or regulatory compliance audits.
+Experience working with sensitive HR or people data.
+Experience in statistical analysis (e.g., hypothesis testing, regression) and applying these methods to the business problems.
+Ability to automate manual analytical processes, such as self-service tools and AI agents.
+About the job
+This is a unique opportunity at Google to be at the forefront of applying AI/ML to solve complex people-analytics challenges at a global scale. You will leverage Google's people data and technology to develop and deploy innovative solutions that directly impact Googlers' lives. You will also play a crucial role in shaping the future of People Analytics by collaborating with cross-functional teams, upskilling colleagues in AI/ML, and fostering a data-driven culture within People Operations. You will make a real difference in the lives of Googlers while contributing to the advancement of AI/ML in the HR domain.
+
+Responsibilities
+Design, develop, and implement "repeatable solutions", such as custom AI agents, NLP models (sentiment/topic modeling), etc., to replace manual workflows with automated code.
+Lead the design and implementation of data pipelines to collect, process, and transform datasets from different sources into "AI-ready" formats.
+Conduct model evaluations and collaborate with teams to deploy ML solutions and automated pipelines into production environments. Partner with various teams to understand business problems, define project scope, and gather requirements for HR data products.
+Be a technical lead for annual external audits and adverse impact analysis by preparing validated datasets and translating regulatory requirements into data specifications.
+Apply the data science expertise within People Analytics domain to develop ML models and AI solutions. Communicate findings and technical concepts to technical and non-technical audiences.

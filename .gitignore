@@ -1,0 +1,35 @@
+# Large model files
+models/
+
+# Data files
+data/
+
+# Images
+images/
+
+# Markdown documentation
+markdown/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS files
+.DS_Store
+*.egg-info/
